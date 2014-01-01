@@ -2,9 +2,11 @@ import re
 import requests
 from bs4 import BeautifulSoup
 from models import Torrent
+from abc import ABCMeta, abstractmethod
 
 
 class TorrentApi(object):
+    __metaclass__ = ABCMeta
 
     def __init__(self, base_url):
         protocol_match = re.match(r'^https?://', base_url)
@@ -13,8 +15,9 @@ class TorrentApi(object):
 
         self.base_url = base_url if not base_url.endswith('/') else base_url[:-1]
 
+    @abstractmethod
     def search(self, query):
-        pass
+        raise NotImplementedError("Should implement search()!")
 
 
 class KickAssTorrentApi(TorrentApi):

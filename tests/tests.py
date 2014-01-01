@@ -16,8 +16,18 @@ class TestFlood(unittest.TestCase):
         with open(path.join(FIXTURES_DIR, "piratebay_response.html"), "r") as f:
             cls.tpb_response = f.read()
 
+    def test_add_protocol_when_needed(self):
+        api = PirateBayApi("sometpbproxy.com")
+        self.assertTrue(api.base_url.startswith("http://"), "Api object adds missing protocol during construction")
+
+    def test_ratio(self):
+        torrent_with_leechers = Torrent("Something", "John", None, None, 50, 25)
+        torrent_without_leechers = Torrent("Something else", "John", None, None, 50, 0)
+        self.assertEqual(torrent_with_leechers.seeder_ratio, 2, "Torrent with leechers has positive ratio")
+        self.assertEqual(torrent_without_leechers.seeder_ratio, float('inf'), "Torrent without leechers has infinite ratio")
+
     @patch('requests.get')
-    def testTPB(self, mock_get):
+    def test_TPB_search(self, mock_get):
         mock_response = Mock()
         mock_response.text = self.tpb_response
         mock_get.return_value = mock_response
@@ -30,7 +40,7 @@ class TestFlood(unittest.TestCase):
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "First Torrent object in list matches expected Torrent object")
 
     @patch('requests.get')
-    def testKAT(self, mock_get):
+    def test_KAT_search(self, mock_get):
         mock_response = Mock()
         mock_response.text = self.kat_response
         mock_get.return_value = mock_response

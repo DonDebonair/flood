@@ -11,5 +11,5 @@ class Torrent(object):
         self.leechers = leechers
 
     @property
-    def ratio(self):
+    def seeder_ratio(self):
         return self.seeders / self.leechers if self.leechers != 0 else float('inf')
