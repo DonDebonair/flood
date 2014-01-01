@@ -1,5 +1,3 @@
-__author__ = 'Daan Debie'
-
 import re
 import requests
 from bs4 import BeautifulSoup
