@@ -41,5 +41,5 @@ class TestFlood(unittest.TestCase):
         expected_first_torrent_name = "Dexter S08E11 HDTV x264-ASAP[rartv]"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "Torrent name of the first found torrents matches expected name")
 
-
-
+if __name__ == '__main__':
+    unittest.main()

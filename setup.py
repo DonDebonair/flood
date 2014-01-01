@@ -12,6 +12,7 @@ setup(
     version='0.1dev',
     packages=find_packages(),
     install_requires=required,
+    test_suite='tests',
     url='https://github.com/DandyDev/flood',
     license='WTFPL 2',
     author='Daan Debie',
