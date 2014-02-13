@@ -27,26 +27,40 @@ class TestFlood(unittest.TestCase):
         self.assertEqual(torrent_without_leechers.seeder_ratio, float('inf'), "Torrent without leechers has infinite ratio")
 
     @patch('requests.get')
-    def test_TPB_search(self, mock_get):
+    def test_tpb_search(self, mock_get):
         mock_response = Mock()
         mock_response.text = self.tpb_response
         mock_get.return_value = mock_response
 
         api = PirateBayApi()
-        torrents = api.search("Dexter")
+        torrents, num_pages = api.search("Dexter")
         self.assertEqual(len(torrents), 30, "30 torrents are found on the first page")
+        self.assertEqual(num_pages, 34, "There are 34 pages of results")
         self.assertIsInstance(torrents[0], Torrent, "PirateBayApi.search returns a list of Torrent objects")
         expected_first_torrent_name = "Dexter S08E12 HDTV x264-EVOLVE[ettv]"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "First Torrent object in list matches expected Torrent object")
 
     @patch('requests.get')
-    def test_KAT_search(self, mock_get):
+    def test_tpb_pagination(self, mock_get):
+        mock_response = Mock()
+        mock_response.text = self.tpb_response
+        mock_get.return_value = mock_response
+
+        api = PirateBayApi()
+        torrents, page_num = api.search("Dexter")
+        mock_get.assert_called_with('http://thepiratebay.se/search/Dexter/0/7/0')
+        torrents, page_num = api.search("Dexter", page=4)
+        mock_get.assert_called_with('http://thepiratebay.se/search/Dexter/3/7/0')
+
+    @patch('requests.get')
+    def test_kat_search(self, mock_get):
         mock_response = Mock()
         mock_response.text = self.kat_response
         mock_get.return_value = mock_response
         api = KickAssTorrentApi()
-        torrents = api.search("Dexter")
+        torrents, num_pages = api.search("Dexter")
         self.assertEqual(len(torrents), 25, "25 torrents are found on the first page")
+        self.assertEqual(num_pages, 199, "There are 199 pages of results")
         self.assertIsInstance(torrents[0], Torrent, "KickAssTorrentApi.search returns a list of Torrent objects")
         expected_first_torrent_name = "Dexter S08E11 HDTV x264-ASAP[rartv]"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "Torrent name of the first found torrents matches expected name")

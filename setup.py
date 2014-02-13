@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='flood',
-    version='0.1dev',
+    version='0.5',
     packages=find_packages(),
     install_requires=required,
     test_suite='tests',

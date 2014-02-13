@@ -25,16 +25,26 @@ class KickAssTorrentApi(TorrentApi):
     def __init__(self, base_url='http://kickass.to'):
         TorrentApi.__init__(self, base_url)
 
-    def search(self, query):
-        search_url = self.base_url + '/search/{}/'.format(query)
+    def search(self, query, page=1):
+        if page == 1:
+            search_url = self.base_url + '/search/{}/'.format(query)
+        else:
+            search_url = self.base_url + '/search/{}/{}/'.format(query, page)
+
         request = requests.get(search_url)
         soup = BeautifulSoup(request.text)
 
-        torrents = []
-        for row in soup.find_all(name='tr', id=re.compile('torrent_')):
-            torrents.append(self._row_to_torrent(row))
+        error_page = soup.find(name='div', class_='errorpage')
 
-        return torrents
+        torrents = []
+        num_pages = 0
+        if not error_page:
+            for row in soup.find_all(name='tr', id=re.compile('torrent_')):
+                torrents.append(self._row_to_torrent(row))
+            pagination = soup.find(name='div', class_='pages')
+            num_pages = int(pagination.find_all('a')[-1].find('span').text)
+
+        return torrents, num_pages
 
     def _row_to_torrent(self, row):
         torrent = Torrent()
@@ -52,18 +62,22 @@ class PirateBayApi(TorrentApi):
     def __init__(self, base_url='http://thepiratebay.se'):
         TorrentApi.__init__(self, base_url)
 
-    def search(self, query):
-        search_url = self.base_url + '/search/{}/0/7/0'.format(query)
+    # page numbers are 0-based for TPB, but we make them 1-based for consistency
+    def search(self, query, page=1):
+        search_url = self.base_url + '/search/{}/{}/7/0'.format(query, page - 1)
         request = requests.get(search_url)
         soup = BeautifulSoup(request.text)
 
         table = soup.find(name='table', id='searchResult')
+        pagination = soup.find(id='main-content').find_next_sibling('div')
+        num_pages = len(pagination.find_all('a'))
 
         torrents = []
-        for row in table.find_all('tr', recursive=False):
-            torrents.append(self._row_to_torrent(row))
+        if num_pages > 0:
+            for row in table.find_all('tr', recursive=False):
+                torrents.append(self._row_to_torrent(row))
 
-        return torrents
+        return torrents, num_pages
 
     def _row_to_torrent(self, row):
         torrent = Torrent()
