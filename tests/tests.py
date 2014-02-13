@@ -65,5 +65,16 @@ class TestFlood(unittest.TestCase):
         expected_first_torrent_name = "Dexter S08E11 HDTV x264-ASAP[rartv]"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "Torrent name of the first found torrents matches expected name")
 
+    @patch('requests.get')
+    def test_kat_pagination(self, mock_get):
+        mock_response = Mock()
+        mock_response.text = self.kat_response
+        mock_get.return_value = mock_response
+        api = KickAssTorrentApi()
+        torrents, num_pages = api.search("Dexter")
+        mock_get.assert_called_with('http://kickass.to/search/Dexter/')
+        torrents, num_pages = api.search("Dexter", 4)
+        mock_get.assert_called_with('http://kickass.to/search/Dexter/4/')
+
 if __name__ == '__main__':
     unittest.main()
