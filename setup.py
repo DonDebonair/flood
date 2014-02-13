@@ -1,5 +1,8 @@
-import ez_setup
-ez_setup.use_setuptools()
+try:
+    import setuptools
+except ImportError:
+    from ez_setup import use_setuptools
+    use_setuptools()
 
 from setuptools import setup
 from setuptools import find_packages
