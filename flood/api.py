@@ -71,11 +71,12 @@ class PirateBayApi(TorrentApi):
         table = soup.find(name='table', id='searchResult')
         pagination = soup.find(id='main-content').find_next_sibling('div')
         num_pages = len(pagination.find_all('a'))
+        if num_pages == 0:  # no pagination links means there is only one page
+            num_pages = 1
 
         torrents = []
-        if num_pages > 0:
-            for row in table.find_all('tr', recursive=False):
-                torrents.append(self._row_to_torrent(row))
+        for row in table.find_all('tr', recursive=False):
+            torrents.append(self._row_to_torrent(row))
 
         return torrents, num_pages
 

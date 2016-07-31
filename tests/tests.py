@@ -17,7 +17,7 @@ class TestFlood(unittest.TestCase):
             cls.tpb_response = f.read()
 
         with open(path.join(FIXTURES_DIR, "piratebay_response_one_page.html"), "r") as f:
-            cls.tbp_one_page_response = f.read()
+            cls.tpb_one_page_response = f.read()
 
     def test_add_protocol_when_needed(self):
         api = PirateBayApi("sometpbproxy.com")
@@ -58,7 +58,7 @@ class TestFlood(unittest.TestCase):
     @patch('requests.get')
     def test_tpb_one_page_result(self, mock_get):
         mock_response = Mock()
-        mock_response.text = self.tbp_one_page_response
+        mock_response.text = self.tpb_one_page_response
         mock_get.return_value = mock_response
         api = PirateBayApi()
         torrents, num_pages = api.search("big buck bunny")
