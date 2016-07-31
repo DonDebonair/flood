@@ -66,6 +66,7 @@ class TestFlood(unittest.TestCase):
         self.assertEqual(num_pages, 1, "There is one page with results")
         expected_first_torrent_name = "Big Buck Bunny (Peach): 720p Stereo OGG Theora version"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "First Torrent object in list matches expected Torrent object")
+        self.assertEqual(torrents[0].size, u"187.78 MiB", "incorrect file size")
 
     @patch('requests.get')
     def test_kat_search(self, mock_get):

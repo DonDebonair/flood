@@ -54,6 +54,7 @@ class KickAssTorrentApi(TorrentApi):
         tds = row.find_all('td')
         torrent.seeders = int(tds[4].text)
         torrent.leechers = int(tds[5].text)
+        torrent.size = 'UNKNOWN'  # TODO
         return torrent
 
 
@@ -61,6 +62,7 @@ class PirateBayApi(TorrentApi):
 
     def __init__(self, base_url='https://thepiratebay.org'):
         TorrentApi.__init__(self, base_url)
+        self.size_regex = re.compile('Size (\d+\.?\d+)[^MGK]+([^,]*)')
 
     # page numbers are 0-based for TPB, but we make them 1-based for consistency
     def search(self, query, page=1):
@@ -83,9 +85,11 @@ class PirateBayApi(TorrentApi):
     def _row_to_torrent(self, row):
         torrent = Torrent()
         torrent_name_tag = row.find(class_='detName')
+        description = row.find(class_='detDesc').text
         torrent.name = torrent_name_tag.find(class_='detLink').text
         torrent.magnet_link = torrent_name_tag.find_next_sibling('a').get('href')
         tds = row.find_all('td')
         torrent.seeders = int(tds[2].text)
         torrent.leechers = int(tds[3].text)
+        torrent.size = ' '.join(self.size_regex.search(description).groups())
         return torrent
