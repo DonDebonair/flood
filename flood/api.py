@@ -11,7 +11,7 @@ class TorrentApi(object):
     def __init__(self, base_url):
         protocol_match = re.match(r'^https?://', base_url)
         if not protocol_match:
-            base_url = 'http://' + base_url
+            base_url = 'https://' + base_url
 
         self.base_url = base_url if not base_url.endswith('/') else base_url[:-1]
 
@@ -59,7 +59,7 @@ class KickAssTorrentApi(TorrentApi):
 
 class PirateBayApi(TorrentApi):
 
-    def __init__(self, base_url='http://thepiratebay.se'):
+    def __init__(self, base_url='https://thepiratebay.org'):
         TorrentApi.__init__(self, base_url)
 
     # page numbers are 0-based for TPB, but we make them 1-based for consistency
