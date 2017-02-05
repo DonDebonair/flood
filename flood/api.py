@@ -62,7 +62,7 @@ class PirateBayApi(TorrentApi):
 
     def __init__(self, base_url='https://thepiratebay.org'):
         TorrentApi.__init__(self, base_url)
-        self.size_regex = re.compile('Size (\d+\.?\d+)[^MGK]+([^,]*)')
+        self.size_regex = re.compile('Size (\d+\.?\d*)[^MGK]+([^,]*)')
 
     # page numbers are 0-based for TPB, but we make them 1-based for consistency
     def search(self, query, page=1):
