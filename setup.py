@@ -12,12 +12,12 @@ with open('requirements.txt') as f:
 
 setup(
     name='flood',
-    version='0.5',
+    version='0.6',
     packages=find_packages(),
     install_requires=required,
     test_suite='tests',
     url='https://github.com/DandyDev/flood',
-    license='WTFPL 2',
+    license='MIT',
     author='Daan Debie',
     author_email='debie.daan@gmail.com',
     description='Python search APIs to various Torrent trackers'
