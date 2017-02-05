@@ -11,7 +11,7 @@ class TorrentApi(object):
     def __init__(self, base_url):
         protocol_match = re.match(r'^https?://', base_url)
         if not protocol_match:
-            base_url = 'http://' + base_url
+            base_url = 'https://' + base_url
 
         self.base_url = base_url if not base_url.endswith('/') else base_url[:-1]
 
@@ -32,7 +32,7 @@ class KickAssTorrentApi(TorrentApi):
             search_url = self.base_url + '/search/{}/{}/'.format(query, page)
 
         request = requests.get(search_url)
-        soup = BeautifulSoup(request.text)
+        soup = BeautifulSoup(request.text, "lxml")
 
         error_page = soup.find(name='div', class_='errorpage')
 
@@ -54,19 +54,21 @@ class KickAssTorrentApi(TorrentApi):
         tds = row.find_all('td')
         torrent.seeders = int(tds[4].text)
         torrent.leechers = int(tds[5].text)
+        torrent.size = 'UNKNOWN'  # TODO
         return torrent
 
 
 class PirateBayApi(TorrentApi):
 
-    def __init__(self, base_url='http://thepiratebay.se'):
+    def __init__(self, base_url='https://thepiratebay.org'):
         TorrentApi.__init__(self, base_url)
+        self.size_regex = re.compile('Size (\d+\.?\d*)[^MGK]+([^,]*)')
 
     # page numbers are 0-based for TPB, but we make them 1-based for consistency
     def search(self, query, page=1):
         search_url = self.base_url + '/search/{}/{}/7/0'.format(query, page - 1)
         request = requests.get(search_url)
-        soup = BeautifulSoup(request.text)
+        soup = BeautifulSoup(request.text, "lxml")
 
         table = soup.find(name='table', id='searchResult')
         pagination = soup.find(id='main-content').find_next_sibling('div')
@@ -83,9 +85,11 @@ class PirateBayApi(TorrentApi):
     def _row_to_torrent(self, row):
         torrent = Torrent()
         torrent_name_tag = row.find(class_='detName')
+        description = row.find(class_='detDesc').text
         torrent.name = torrent_name_tag.find(class_='detLink').text
         torrent.magnet_link = torrent_name_tag.find_next_sibling('a').get('href')
         tds = row.find_all('td')
         torrent.seeders = int(tds[2].text)
         torrent.leechers = int(tds[3].text)
+        torrent.size = ' '.join(self.size_regex.search(description).groups())
         return torrent

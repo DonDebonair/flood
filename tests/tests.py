@@ -21,7 +21,7 @@ class TestFlood(unittest.TestCase):
 
     def test_add_protocol_when_needed(self):
         api = PirateBayApi("sometpbproxy.com")
-        self.assertTrue(api.base_url.startswith("http://"), "Api object adds missing protocol during construction")
+        self.assertTrue(api.base_url.startswith("https://"), "Api object adds missing protocol during construction")
 
     def test_ratio(self):
         torrent_with_leechers = Torrent("Something", "John", None, None, 50, 25)
@@ -51,9 +51,9 @@ class TestFlood(unittest.TestCase):
 
         api = PirateBayApi()
         torrents, page_num = api.search("Dexter")
-        mock_get.assert_called_with('http://thepiratebay.se/search/Dexter/0/7/0')
+        mock_get.assert_called_with('https://thepiratebay.org/search/Dexter/0/7/0')
         torrents, page_num = api.search("Dexter", page=4)
-        mock_get.assert_called_with('http://thepiratebay.se/search/Dexter/3/7/0')
+        mock_get.assert_called_with('https://thepiratebay.org/search/Dexter/3/7/0')
 
     @patch('requests.get')
     def test_tpb_one_page_result(self, mock_get):
@@ -66,6 +66,7 @@ class TestFlood(unittest.TestCase):
         self.assertEqual(num_pages, 1, "There is one page with results")
         expected_first_torrent_name = "Big Buck Bunny (Peach): 720p Stereo OGG Theora version"
         self.assertEqual(torrents[0].name, expected_first_torrent_name, "First Torrent object in list matches expected Torrent object")
+        self.assertEqual(torrents[0].size, u"187.78 MiB", "incorrect file size")
 
     @patch('requests.get')
     def test_kat_search(self, mock_get):
