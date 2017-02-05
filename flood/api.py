@@ -32,7 +32,7 @@ class KickAssTorrentApi(TorrentApi):
             search_url = self.base_url + '/search/{}/{}/'.format(query, page)
 
         request = requests.get(search_url)
-        soup = BeautifulSoup(request.text)
+        soup = BeautifulSoup(request.text, "lxml")
 
         error_page = soup.find(name='div', class_='errorpage')
 
@@ -68,7 +68,7 @@ class PirateBayApi(TorrentApi):
     def search(self, query, page=1):
         search_url = self.base_url + '/search/{}/{}/7/0'.format(query, page - 1)
         request = requests.get(search_url)
-        soup = BeautifulSoup(request.text)
+        soup = BeautifulSoup(request.text, "lxml")
 
         table = soup.find(name='table', id='searchResult')
         pagination = soup.find(id='main-content').find_next_sibling('div')
